@@ -1,0 +1,6 @@
+#include "network.h"
+#include "data.h"
+#include "conv_layer.h"
+#include "maxpool_layer.h"
+#include "connected_layer.h"
+#include "softmax_layer.h"
