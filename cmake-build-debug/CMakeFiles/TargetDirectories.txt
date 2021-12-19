@@ -1,0 +1,3 @@
+C:/Users/giorgosflg/CLionProjects/deviltest/cmake-build-debug/CMakeFiles/deviltest.dir
+C:/Users/giorgosflg/CLionProjects/deviltest/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/giorgosflg/CLionProjects/deviltest/cmake-build-debug/CMakeFiles/rebuild_cache.dir
