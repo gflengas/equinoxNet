@@ -3,7 +3,8 @@
 
 FC_layer init_FC_layer(int batch, int inputs, int outputs)
 {
-    FC_layer l = {0};
+    FC_layer l = { (LAYER_TYPE)0 };
+    l.type = CONNECTED;
 
     l.inputs = inputs;
     l.outputs = outputs;
@@ -26,21 +27,25 @@ FC_layer init_FC_layer(int batch, int inputs, int outputs)
 
     //initialise weights based on the He initialization
     float scale = sqrt(2./(outputs*inputs));
-    for(int i = 0; i < outputs*inputs; ++i) l.weights[i] = scale* rand_uniform(-1,1);//rand_normal();
+    for(int i = 0; i < outputs*inputs; ++i) l.weights[i] = scale*rand_normal();
 
     for(int i = 0; i < outputs; ++i) l.biases[i] = 0;
+
+
+    l.forward = FC_layer_fwd;
+    l.backward = FC_layer_bwd;
+    l.update = FC_update;
 
     return l;
 }
 
 
-void FC_layer_fwd(FC_layer l, network net)
+void FC_layer_fwd(FC_layer l, network_state state)
 {
-    fill_cpu(l.outputs*l.batch, 0, l.output, 1);
     int m = l.batch;
     int k = l.inputs;
     int n = l.outputs;
-    float *a = net.input;
+    float *a = state.input;
     float *b = l.weights;
     float *c = l.output;
     gemm_nt(m,n,k,a,k,b,k,c,n);
@@ -52,19 +57,17 @@ void FC_layer_fwd(FC_layer l, network net)
     }
 }
 
-void FC_layer_bwd(FC_layer l, network net)
+void FC_layer_bwd(FC_layer l, network_state state)
 {
-    //l.delta = l.output; --------------------------------------------------------
-//    for (int i = 0; i < l.outputs*l.batch; ++i) {
-//        l.delta[i] *= l.output[i];
-//    }
-    //calculate updates for biases
+    //l.delta = l.output;  -----------------------------------------------------------------------------------------------
+
     for (int i = 0; i < l.inputs*l.outputs; ++i) {
         l.weight_updates[i]=0;
     }
     for (int i = 0; i < l.outputs; ++i) {
         l.bias_updates[i]=0;
     }
+    //calculate updates for biases
     for (int b = 0; b < l.batch; b++)
     {
         for (int i = 0; i < l.outputs; i++)
@@ -78,18 +81,21 @@ void FC_layer_bwd(FC_layer l, network net)
     int k = l.batch;
     int n = l.inputs;
     float *a = l.delta;
-    float *b = net.input;
+    float *b = state.input;
     float *c = l.weight_updates;
 
     gemm_tn(m,n,k,a,m,b,n,c,n);
     //calculate gradient
+    for (int i = 0; i < l.outputs*l.inputs; ++i) {
+        state.delta[i]=0;
+    }
     m = l.batch;
     k = l.outputs;
     n = l.inputs;
 
     a = l.delta;
     b = l.weights;
-    c = net.delta;
+    c = state.delta;
 
     if(c) gemm_nn(m,n,k,a,k,b,n,c,n);
 

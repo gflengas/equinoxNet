@@ -127,16 +127,9 @@ float *parse_fields(char *line, int n)
 
 void get_random_batch(data d, int n, float *X, float *y)
 {
-    int j;
-    for(j = 0; j < n; ++j){
+    for(int j = 0; j < n; ++j){
         int index = rand()%d.X.rows;
         memcpy(X+j*d.X.cols, d.X.vals[index], d.X.cols*sizeof(float));
-         for(int i=0; i<d.y.cols;i++){
-             //X[j*d.X.cols+i] = d.X.vals[index][i];
-             if(isnan(X[j*d.y.cols+i])){
-                 printf("Found a NAN into the data!\n");
-             }
-         }
         memcpy(y+j*d.y.cols, d.y.vals[index], d.y.cols*sizeof(float));
     }
 }

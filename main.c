@@ -1,20 +1,16 @@
 #include "data.h"
-#include "conv_layer.h"
-#include "maxpool_layer.h"
-#include "connected_layer.h"
-#include "softmax_layer.h"
+#include "network.h"
 #include <time.h>
-int main(void){
 
+int main() {
     //load data
     clock_t start = clock();
     char *train_images = "C:\\Users\\giorgosflg\\CLionProjects\\deviltest\\mnist_train.csv";
     data d = load_categorical_data_csv(train_images, 0, 10);
-    float b_acc,t_acc=0,sum=0;
+    float b_acc,t_acc,sum;
     normalize_data_rows(d);
     //set network parameters
-    network net ={0};
-    net.n = 4; //num of layers
+    network net=make_network(4);
     net.cost = calloc(1, sizeof(float));
     net.batch=4;
     net.w=28;
@@ -28,106 +24,28 @@ int main(void){
     net.input = calloc(net.inputs*net.batch, sizeof(float));
     net.truths = 10;
     net.truth = calloc(net.truths*net.batch, sizeof(float));
-    //printf("net.inputs: %d net.truth: %d \n",net.inputs*net.batch,net.truths*net.batch);
+    conv_layer conv1 = init_convolutional_layer(net.batch, net.h, net.w, net.c, 12, 3, 1 , 1);
     //initialize the layers of the network
     //1 conv layer
-    conv_layer conv1 = init_convolutional_layer(net.batch, net.h, net.w, net.c, 12, 3, 1 , 1);
-
+    net.layers[0]=conv1;
     if(conv1.workspace_size > workspace_size) workspace_size = conv1.workspace_size;
     net.workspace = calloc(1, workspace_size);
-
     //2 maxpool layer
     maxpool_layer MP1 = init_maxpool_layer(net.batch, conv1.out_h, conv1.out_w, conv1.out_c, 2, 1, 1);
-
+    net.layers[1]=MP1;
     //3 FC layer
     FC_layer fc = init_FC_layer(net.batch, MP1.outputs, 10);
-
+    net.layers[2]=fc;
     //4 softmax
     softmax_layer sfm = init_softmax_layer(net.batch,10);
-
+    net.layers[3]=sfm;
     //training start
     assert(d.X.rows % net.batch == 0);
-    int n = 2000;// d.X.rows / net.batch;
-
-    for (int e=0 ; e< 20;++e) {
-//        sum=0;
-//        t_acc=0;
-        printf("------Epoch :%d-----\n", e+1);
-        for (int i = 0; i < n; i++) {
-            //get the next batch that will be processed
-            //get_next_batch(d,net.batch,i*net.batch, net.input, net.truth);
-            get_random_batch(d, net.batch, net.input, net.truth);
-            float err = 0;
-            //forward
-            //save original input and delta for backprop on conv
-            float *original_input = net.input;
-            float *original_delta = net.delta;
-            if (conv1.delta) {
-                fill_cpu(conv1.outputs * conv1.batch, 0, conv1.delta, 1);
-            }
-            conv_fwd(conv1, net);
-            net.input = conv1.output;
-
-            if (MP1.delta) {
-                fill_cpu(MP1.outputs * MP1.batch, 0, MP1.delta, 1);
-            }
-            maxpool_fwd(MP1, net);
-            net.input = MP1.output;
-
-            if (fc.delta) {
-                fill_cpu(fc.outputs * fc.batch, 0, fc.delta, 1);
-            }
-            FC_layer_fwd(fc, net);
-            net.input = fc.output;
-
-            if (sfm.delta) {
-                fill_cpu(sfm.outputs * sfm.batch, 0, sfm.delta, 1);
-            }
-            softmax_fwd(sfm, net);
-
-            b_acc = batch_acc(net.batch, sfm.outputs, sfm.output, net.truth);
-            t_acc += b_acc;
-//            printf("------Batch :%d-----\n", (i+1)*(e+1));
-//            printf("loss: %f accuracy: %.2f %c \n", sfm.cost[0] / net.batch, b_acc * 100, '%');
-            sum += sfm.cost[0]; // ++error
-
-            //backward
-            //3
-            net.input = fc.output;
-            net.delta = fc.delta;
-            softmax_bwd(sfm, net);
-
-            //2
-            net.input = MP1.output;
-            net.delta = MP1.delta;
-            FC_layer_bwd(fc, net);
-
-            //1
-            net.input = conv1.output;
-            net.delta = conv1.delta;
-            maxpool_bwd(MP1, net);
-
-            //0
-            net.input = original_input;
-            net.delta = original_delta;
-            conv_bwd(conv1, net);
-
-            // //upgrade network
-            update_conv_layer(conv1, net.batch, net.learning_rate, net.momentum, net.decay);
-            FC_update(fc, net.batch, net.learning_rate, net.momentum, net.decay);
-        }
-        printf("average loss: %f accuracy: %.2f %c \n",sum/(net.batch*n*(e+1)),t_acc/(n*(e+1))*100,'%');
-        float avg_val = 0;
-        for (int k = 0; k < conv1.c * conv1.n * conv1.size * conv1.size; ++k) avg_val += conv1.weights[k];
-        printf("Conv - avg_val = %f \n", avg_val / (conv1.c * conv1.n * conv1.size * conv1.size));
-        avg_val = 0;
-        for (int k = 0; k < fc.outputs * fc.inputs; ++k) avg_val += fc.weights[k];
-        printf("fc - avg_val = %f \n", avg_val / (fc.outputs * fc.inputs));
+    for (int e = 0; e < 10 ; ++e) {
+        train_network_sgd(net,d,200);
     }
+
     clock_t stop = clock();
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
     printf("\nTime elapsed: %.5f\n", elapsed);
-
-
-    return 0;
 }

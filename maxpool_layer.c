@@ -2,7 +2,9 @@
 
 maxpool_layer init_maxpool_layer(int batch, int h, int w, int c, int size, int stride, int padding)
 {
-    maxpool_layer l = {0};
+    maxpool_layer l = { (LAYER_TYPE)0 };
+    l.type = MAXPOOL;
+
     l.batch = batch;
     l.h = h;
     l.w = w;
@@ -19,10 +21,13 @@ maxpool_layer init_maxpool_layer(int batch, int h, int w, int c, int size, int s
     l.indexes = calloc(output_size, sizeof(int));
     l.output =  calloc(output_size, sizeof(float));
     l.delta =   calloc(output_size, sizeof(float));
+
+    l.forward = maxpool_fwd;
+    l.backward = maxpool_bwd;
     return l;
 }
 
-void maxpool_fwd(const maxpool_layer l, network net){
+void maxpool_fwd(const maxpool_layer l, network_state state){
     int w_offset = -l.pad/2;
     int h_offset = -l.pad/2;
 
@@ -44,7 +49,7 @@ void maxpool_fwd(const maxpool_layer l, network net){
                             int index = cur_w + l.w*(cur_h + l.h*(k + b*l.c));
                             int valid = (cur_h >= 0 && cur_h < l.h &&
                                          cur_w >= 0 && cur_w < l.w);
-                            float val = (valid != 0) ? net.input[index] : -FLT_MAX;
+                            float val = (valid != 0) ? state.input[index] : -FLT_MAX;
                             max_i = (val > max) ? index : max_i;
                             max   = (val > max) ? val   : max;
                         }
@@ -57,12 +62,12 @@ void maxpool_fwd(const maxpool_layer l, network net){
     }
 }
 
-void maxpool_bwd(const maxpool_layer l, network net){
+void maxpool_bwd(const maxpool_layer l, network_state state){
     int h = l.out_h;
     int w = l.out_w;
     int c = l.c;
     for(int i = 0; i < h*w*c*l.batch; ++i){
         int index = l.indexes[i];
-        net.delta[index] += l.delta[i];
+        state.delta[index] += l.delta[i];
     }
 }

@@ -1,7 +1,7 @@
 #ifndef DEVILTEST_CUSTOM_MATH_H
 #define DEVILTEST_CUSTOM_MATH_H
-#include "core.h"
 #include <math.h>
+#include "core.h"
 #include <assert.h>
 #include <float.h>
 #include <stdio.h>
@@ -18,7 +18,7 @@ float rand_normal();
 
 void scale(int N, float ALPHA, float *X, int INCX);
 void axpy(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
-void fill_cpu(int N, float ALPHA, float *X, int INCX);
+
 void gemm_nn(int M, int N, int K, float *A, int lda, float *B, int ldb, float *C, int ldc);
 void gemm_nt(int M, int N, int K, float *A, int lda, float *B, int ldb, float *C, int ldc);
 void gemm_tn(int M, int N, int K, float *A, int lda, float *B, int ldb, float *C, int ldc);
@@ -36,7 +36,4 @@ static inline float leaky_activate(float x){return (x>0) ? x : .1*x;}
 static inline float leaky_gradient(float x){return (x>0) ? 1 : .1;}
 static inline float relu_gradient(float x){return (x>0);}
 static inline float elu_gradient(float x){return (x >= 0) + (x < 0)*(x + 1);}
-void top_k(float *a, int n, int k, int *index);
-float matrix_topk_accuracy(matrix truth, matrix guess, int k);
-float rand_uniform(float min, float max);
 #endif //DEVILTEST_CUSTOM_MATH_H
