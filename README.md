@@ -1,5 +1,6 @@
 # Convolution Neural Network Training in C 
-This is the 2nd part of my thesis work and continuation of [Convolution-Neural-Network-Training](https://github.com/gflengas/Convolution-Neural-Network-Training)
+This is the 2nd part of my thesis work and continuation of [Convolution-Neural-Network-Training](https://github.com/gflengas/Convolution-Neural-Network-Training).
+
 The current network for CNN training with Mini-Batch Gradient Descent is developed on C and 
 trained with the MNIST data set. It consists of a Convolutional layer with 12 3×3 filters 
 initialized with He initialization using Relu as activation function, a Maxpool layer with pool 
@@ -7,6 +8,8 @@ size 2, and a fully connected layer using SoftMax as activation function. To mea
 accuracy of the network, the Categorical Cross-Entropy Loss function is used. The training 
 parameters that were used for the results presented are: batch size= 4, learning rate=0.01, 
 momentum 0.9, decay 0.00005, epoch 20 and iterations 2000.
+
+![network image](https://github.com/gflengas/equinoxNet/blob/main/flow%20of%20simple%20cnn.jpg)
 
 Small cnn training running on MNIST 
 Results:
