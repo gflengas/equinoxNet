@@ -49,7 +49,7 @@ matrix csv_to_matrix(char *filename)
     return m;
 }
 
-float **one_hot_encode(float *a, int n, int k)
+float **one_hot_encode(float const *a, int n, int k)
 {
     int i;
     float **t = calloc(n, sizeof(float*));
@@ -64,7 +64,7 @@ float **one_hot_encode(float *a, int n, int k)
 char *fgetl(FILE *fp)
 {
     if(feof(fp)) return 0;
-    size_t size = 512;
+    int size = 512;
     char *line = malloc(size*sizeof(char));
     if(!fgets(line, size, fp)){
         free(line);
@@ -78,12 +78,12 @@ char *fgetl(FILE *fp)
             size *= 2;
             line = realloc(line, size*sizeof(char));
             if(!line) {
-                printf("%ld\n", size);
+                printf("%d\n", size);
                 fprintf(stderr, "Malloc error\n");
                 exit(-1);
             }
         }
-        size_t readsize = size-curr;
+        int readsize = size-curr;
         if(readsize > INT_MAX) readsize = INT_MAX-1;
         fgets(&line[curr], readsize, fp);
         curr = strlen(line);
@@ -128,24 +128,19 @@ float *parse_fields(char *line, int n)
 void get_random_batch(data d, int n, float *X, float *y)
 {
     for(int j = 0; j < n; ++j){
-        int index = rand()%d.X.rows;
+        int index = rand()%d.X.rows;//(int)rand_uniform(0,d.X.rows)
         memcpy(X+j*d.X.cols, d.X.vals[index], d.X.cols*sizeof(float));
         memcpy(y+j*d.y.cols, d.y.vals[index], d.y.cols*sizeof(float));
     }
 }
-//get_next_batch(d, batch, i*batch, net->input, net->truth);
-//get_next_batch(d, 2, 0, net->input, net->truth);
+
 void get_next_batch(data d, int n, int offset, float *X, float *y)
 {
     for(int j = 0; j < n; ++j){
         int index = offset + j;
-        //printf("index: %d batch: %d offset: %d \n ",index,n,offset);
         memcpy(X+j*d.X.cols, d.X.vals[index], d.X.cols*sizeof(float));
         if(y) memcpy(y+j*d.y.cols, d.y.vals[index], d.y.cols*sizeof(float));
-        // for(int i=0; i<d.y.cols;i++){
-        //     //X[j*d.X.cols+i] = d.X.vals[index][i];
-        //     printf("data j=%d and i=%d : %15.7f \n",j,i, X[j*d.y.cols+i]);
-        // }
+
     }
 }
 
@@ -170,8 +165,23 @@ void normalize_data_rows(data d)
         normalize_array(d.X.vals[i], d.X.cols);
     }
 }
+void free_data(data d)
+{
 
-float batch_acc(int batch,int k, float *guess, float *truth)
+    free_matrix(d.X);
+    free_matrix(d.y);
+    free(d.X.vals);
+    free(d.y.vals);
+}
+
+void free_matrix(matrix m)
+{
+    int i;
+    for(i = 0; i < m.rows; ++i) free(m.vals[i]);
+    free(m.vals);
+}
+
+float batch_acc(int batch,int k, float const *guess, float const *truth)
 {
     int* index = calloc(batch*k, sizeof(int));
     float max,acc=0;
@@ -190,7 +200,8 @@ float batch_acc(int batch,int k, float *guess, float *truth)
         index[index_max] = 1;
     }
     for (int i = 0; i < batch*k ; ++i) {
-        if(truth[i] == index[i]) acc++;
+        if(truth[i] == (float)index[i]) acc++;
     }
+    free(index);
     return acc/batch;
 }
