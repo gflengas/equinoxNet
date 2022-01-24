@@ -83,7 +83,6 @@ fc - avg_val = 0.000005
 average loss: 0.122864 accuracy: 96.33 %
 
 Conv - avg_val = -0.050384
-
 fc - avg_val = 0.000005
 
 Time elapsed: 313.28600
