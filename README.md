@@ -15,74 +15,44 @@ Small cnn training running on MNIST
 Results:
 
 ------Epoch :1-----
-
-average loss: 0.370688 accuracy: 88.64 %
-
-Conv - avg_val = -0.010797
-
+average loss: 0.300562 accuracy: 90.56 %
+Conv - avg_val = -0.003535
 fc - avg_val = 0.000005
-
 ------Epoch :2-----
-
-average loss: 0.271359 accuracy: 91.69 %
-
-Conv - avg_val = -0.020622
+average loss: 0.197186 accuracy: 93.87 %
+Conv - avg_val = -0.008266
 fc - avg_val = 0.000005
-
 ------Epoch :3-----
-
-average loss: 0.220453 accuracy: 93.33 %
-
-Conv - avg_val = -0.029476
+average loss: 0.150811 accuracy: 95.36 %
+Conv - avg_val = -0.015109
 fc - avg_val = 0.000005
-
 ------Epoch :4-----
-
-average loss: 0.193414 accuracy: 94.13 %
-
-Conv - avg_val = -0.032782
+average loss: 0.122404 accuracy: 96.25 %
+Conv - avg_val = -0.018762
 fc - avg_val = 0.000005
-
 ------Epoch :5-----
-
-average loss: 0.174565 accuracy: 94.73 %
-
-Conv - avg_val = -0.035303
+average loss: 0.102462 accuracy: 96.88 %
+Conv - avg_val = -0.019427
 fc - avg_val = 0.000005
-
 ------Epoch :6-----
-
-average loss: 0.158270 accuracy: 95.21 %
-
-Conv - avg_val = -0.037884
+average loss: 0.087829 accuracy: 97.35 %
+Conv - avg_val = -0.016657
 fc - avg_val = 0.000005
-
 ------Epoch :7-----
-
-average loss: 0.147352 accuracy: 95.55 %
-
-Conv - avg_val = -0.042872
+average loss: 0.077108 accuracy: 97.69 %
+Conv - avg_val = -0.017337
 fc - avg_val = 0.000005
-
 ------Epoch :8-----
-
-average loss: 0.136984 accuracy: 95.87 %
-
-Conv - avg_val = -0.039950
+average loss: 0.068257 accuracy: 97.97 %
+Conv - avg_val = -0.015872
 fc - avg_val = 0.000005
-
 ------Epoch :9-----
-
-average loss: 0.129570 accuracy: 96.13 %
-
-Conv - avg_val = -0.047734
+average loss: 0.061224 accuracy: 98.19 %
+Conv - avg_val = -0.013994
 fc - avg_val = 0.000005
-
 ------Epoch :10-----
-
-average loss: 0.122864 accuracy: 96.33 %
-
-Conv - avg_val = -0.050384
+average loss: 0.055467 accuracy: 98.37 %
+Conv - avg_val = -0.013158
 fc - avg_val = 0.000005
 
 Time elapsed: 313.28600
