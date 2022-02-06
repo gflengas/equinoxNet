@@ -16,7 +16,6 @@ int main(void) {
 
     //set network parameters
     network net = {0};
-    net.n = 4; //num of layers
     net.cost = calloc(1, sizeof(float));
     net.batch = 8;
     net.w = 28;
@@ -25,7 +24,6 @@ int main(void) {
     net.momentum = 0.9;
     net.decay = 0.00005;
     net.learning_rate = 0.01;
-    size_t workspace_size = 0;
     net.inputs = net.h * net.w * net.c;
     net.input = calloc(net.inputs * net.batch, sizeof(float));
     net.truths = 10;
@@ -36,8 +34,6 @@ int main(void) {
     conv_layer conv1 = init_convolutional_layer(net.batch, net.h, net.w, net.c, 12,
                                                 3, 1, 1);
 
-    if (conv1.workspace_size > workspace_size) workspace_size = conv1.workspace_size;
-    net.workspace = calloc(1, workspace_size);
 
     //2 maxpool layer
     maxpool_layer MP1 = init_maxpool_layer(net.batch, conv1.out_h, conv1.out_w, conv1.out_c,
@@ -51,7 +47,7 @@ int main(void) {
 
     //training start
     assert(d.X.rows % net.batch == 0);
-    int n = 2000;// d.X.rows / net.batch;
+    int n = 200;// d.X.rows / net.batch;
 
     for (int e = 0; e < 1; ++e) {
 
@@ -144,7 +140,6 @@ int main(void) {
     //free network related parameters
     free(net.input);
     free(net.truth);
-    free(net.workspace);
     free(net.cost);
     return 0;
 }

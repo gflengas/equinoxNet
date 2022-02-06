@@ -170,8 +170,6 @@ void free_data(data d)
 
     free_matrix(d.X);
     free_matrix(d.y);
-    free(d.X.vals);
-    free(d.y.vals);
 }
 
 void free_matrix(matrix m)

@@ -26,6 +26,7 @@ typedef struct{
     float * output;//+
 
     size_t workspace_size; //+
+    float * workspace;
 }conv_layer;
 
 conv_layer init_convolutional_layer(int batch, int h, int w, int c, int n, int size, int stride, int padding);

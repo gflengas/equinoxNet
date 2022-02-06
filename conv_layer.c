@@ -36,6 +36,7 @@ conv_layer init_convolutional_layer(int batch, int h, int w, int c, int n, int s
     l.delta  = calloc(l.batch*l.outputs, sizeof(float));
 
     l.workspace_size = (size_t)l.out_h*l.out_w*l.size*l.size*l.c*sizeof(float);
+    l.workspace = calloc(l.workspace_size,sizeof(float));
     return l;
 }
 
@@ -51,7 +52,7 @@ void conv_fwd(conv_layer l, network net){
     //use gemm to get the output of input x weights for each batch.
     for (int i = 0; i < l.batch; i++)
     {
-        float *b = net.workspace;
+        float *b = l.workspace;
         float *c = l.output + i*n*m;
         float *im =  net.input + i*l.h*l.w*l.c;
         //get the image adding padding and stride and turn it into a column using the image to column method
@@ -113,7 +114,8 @@ void conv_bwd(conv_layer l, network net)
     for(int i = 0; i < l.batch; ++i){
 
         float *a = l.delta + i*m*k;
-        float *b = net.workspace;
+        fill(l.workspace_size,0,l.workspace,1);
+        float *b = l.workspace;
         float *c = l.weight_updates;
 
         float *im  = net.input + i*l.c*l.h*l.w;
@@ -132,7 +134,8 @@ void conv_bwd(conv_layer l, network net)
         if (net.delta) {
             a = l.weights;
             b = l.delta + i*m*k;
-            c = net.workspace;
+            fill(l.workspace_size,0,l.workspace,1);
+            c = l.workspace;
             if (l.size == 1) {
                 c = imd;
             }
@@ -140,7 +143,7 @@ void conv_bwd(conv_layer l, network net)
             gemm_tn(n,k,m,a,n,b,k,c,k);
 
             if (l.size != 1) {
-                col2im_cpu(net.workspace, l.c, l.h, l.w,
+                col2im_cpu(l.workspace, l.c, l.h, l.w,
                            l.size, l.stride, l.pad, imd);
             }
         }
@@ -168,4 +171,5 @@ void free_conv_layer(conv_layer l){
 
     free(l.delta);
     free(l.output);
+    free(l.workspace);
 }
